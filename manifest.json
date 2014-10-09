@@ -1,0 +1,17 @@
+{
+  "name": "OA Button",
+  "version": "0.1",
+  "manifest_version": 2,
+  "description": "OA Button extension, recording injustice for batman.",
+  "icons": { "128": "img/oa128.png" },
+  "browser_action": {
+    "default_title": "OA Button",
+    "default_icon": "img/oa64.png",
+    "default_popup": "ui/oa.html"
+  },
+  "permissions": [
+    "tabs",
+    "http://*/*",
+    "http://*/*"
+  ]
+}
