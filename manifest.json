@@ -7,11 +7,12 @@
   "browser_action": {
     "default_title": "OA Button",
     "default_icon": "img/oa64.png",
-    "default_popup": "ui/oa.html"
+    "default_popup": "ui/login.html"
   },
   "permissions": [
     "tabs",
     "http://*/*",
-    "http://*/*"
+    "http://*/*",
+    "storage"
   ]
 }
