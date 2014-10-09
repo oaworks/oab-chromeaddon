@@ -1,14 +1,12 @@
-var page_main = ""
 var current_page = location.pathname
-var key = ""
+var key = localStorage.getItem("api_key");
 
 if (current_page == '/ui/login.html') {
-	chrome.storage.sync.get('api_key', function (result) {
-		if (result.api_key) {
-			window.location.href = "main.html";
-		}
-    });
 	window.addEventListener('load', function () {
+
+	if (key){
+		window.location.href = '/ui/main.html';
+	}
 
     document.getElementById("signup").addEventListener('click', function(){
     	var response = ''
@@ -29,9 +27,7 @@ if (current_page == '/ui/login.html') {
 	        }),
 	        'success': function(data){
 	        	console.log(data)
-	        	chrome.storage.sync.set({'api_key': data.api_key}, function() {
-		        console.log('Settings saved');
-        });
+        		localStorage.setItem("api_key", data.api_key);
         	},
 	        'error': function(data){
             	console.log(data)
@@ -42,9 +38,12 @@ if (current_page == '/ui/login.html') {
 
     // Handle login
     document.getElementById("login").addEventListener('click', function(){
-    	window.location.href = "main.html";
-    	
+    	window.location.href = "main.html";	
     });
 
-});
+	});
+} else if (current_page == '/ui/main.html' && key) {
+	console.log(key)
+} else {
+	window.location.href = "login.html";	
 }
