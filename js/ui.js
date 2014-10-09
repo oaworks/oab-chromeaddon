@@ -3,6 +3,19 @@ var key = localStorage.getItem("api_key");
 var serviceaddress = 'http://oabutton.cottagelabs.com';
 var apiaddress = serviceaddress + '/api';
 
+function get_active_tab() {
+	chrome.tabs.query({currentWindow: true, active: true}, function(tabs){
+	    console.log(tabs[0].url);
+	    localStorage.setItem('active_tab', tabs[0].url);
+	});
+}
+
+function handle_data(data) {
+	console.log(data.contentmine.metadata['title'])
+	document.getElementById("api_content").innerHTML += "<h5>" + data.contentmine.metadata['title'] + '</h5>';
+	document.getElementById("api_content").innerHTML += "<ul><li>Blocked: " + data.blocked + '</li>' + "<li>Wishlist: " + data.wishlist + '</li></ul>';
+}
+
 function login_register_api_call(api_request, data) {
 	var response = ''
 	var api_key = '';
@@ -26,10 +39,10 @@ function login_register_api_call(api_request, data) {
     });
 }
 
-function status_request(url) {
+function status_request(url, api_request) {
 	$.ajax({
         'type': 'POST',
-        'url': apiaddress + '/status',
+        'url': apiaddress + api_request,
         'contentType': 'application/json; charset=utf-8',
         'dataType': 'JSON',
         'processData': false,
@@ -39,14 +52,16 @@ function status_request(url) {
             'url': url
         }),
         'success': function(data){
-    		// Todo: Handle success. EG. Display info.
-    		console.log(data)
+    		handle_data(data);
     	},
         'error': function(data){
     		// Todo: Handle error here.
     	},
     });
 }
+
+// Setup
+get_active_tab()
 
 if (current_page == '/ui/login.html') {
 	window.addEventListener('load', function () {
@@ -85,7 +100,7 @@ if (current_page == '/ui/login.html') {
     		if ('api_key' in localStorage) localStorage.removeItem('api_key');
     		window.location.href = 'login.html';
     	});
-		status_request(document.URL);
+		status_meta = status_request(localStorage.getItem("active_tab"), '/status');
 	});
 
 } else {

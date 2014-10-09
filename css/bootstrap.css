@@ -12,7 +12,7 @@ html {
 }
 body {
   margin: 0;
-  width: 200px;
+  width: 250px;
   height: 500px;
 }
 article,
@@ -1103,6 +1103,7 @@ h6,
 }
 p {
   margin: 0 0 10px;
+  font-size: 10px;
 }
 .lead {
   margin-bottom: 20px;
