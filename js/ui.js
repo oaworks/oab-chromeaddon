@@ -1,10 +1,10 @@
 var current_page = location.pathname
 var key = localStorage.getItem("api_key");
+var serviceaddress = 'http://oabutton.cottagelabs.com';
+var apiaddress = serviceaddress + '/api';
 
 function login_register_api_call(api_request, data) {
 	var response = ''
-	var serviceaddress = 'http://oabutton.cottagelabs.com';
-	var apiaddress = serviceaddress + '/api';
 	var api_key = '';
 	var username = '';
     $.ajax({
@@ -16,12 +16,34 @@ function login_register_api_call(api_request, data) {
         'cache': false,
         'data': data,
         'success': function(data){
-        	console.log(data)
     		localStorage.setItem("api_key", data.api_key);
     		window.location.href = "login.html"
     	},
         'error': function(data){
+        	// Todo: Handle error here.
         	console.log(data)
+    	},
+    });
+}
+
+function status_request(url) {
+	$.ajax({
+        'type': 'POST',
+        'url': apiaddress + '/status',
+        'contentType': 'application/json; charset=utf-8',
+        'dataType': 'JSON',
+        'processData': false,
+        'cache': false,
+        'data': JSON.stringify({
+            'api_key': key,
+            'url': url
+        }),
+        'success': function(data){
+    		// Todo: Handle success. EG. Display info.
+    		console.log(data)
+    	},
+        'error': function(data){
+    		// Todo: Handle error here.
     	},
     });
 }
@@ -63,6 +85,7 @@ if (current_page == '/ui/login.html') {
     		if ('api_key' in localStorage) localStorage.removeItem('api_key');
     		window.location.href = 'login.html';
     	});
+		status_request(document.URL);
 	});
 
 } else {
