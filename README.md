@@ -5,9 +5,11 @@ Open Access Button Chrome Extension
 
 Done
 ----
-Register
-Login
+
+- Register
+- Login
 
 To Do
 -----
-Everything else.
+
+- Everything else.
