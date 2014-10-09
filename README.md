@@ -3,13 +3,11 @@ oab-chromeaddon
 
 Open Access Button Chrome Extension
 
-Done
-----
-
-- Register
-- Login
 
 To Do
 -----
 
-- Everything else.
+- ~~Register~~
+- ~~Login~~
+- Catch if there is no email or password.
+- Write display function for errors (bootstrap notices.)
