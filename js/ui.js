@@ -11,8 +11,7 @@ function get_active_tab() {
 }
 
 function handle_data(data) {
-	console.log(data.contentmine.metadata['title'])
-	document.getElementById("api_content").innerHTML += "<h5>" + data.contentmine.metadata['title'] + '</h5>';
+	document.getElementById("api_content").innerHTML = "<h5>" + data.contentmine.metadata['title'] + '</h5>';
 	document.getElementById("api_content").innerHTML += "<ul><li>Blocked: " + data.blocked + '</li>' + "<li>Wishlist: " + data.wishlist + '</li></ul>';
 }
 

@@ -13,7 +13,6 @@
     "tabs",
     "http://*/*",
     "http://*/*",
-    "storage",
-    "tabs"
+    "storage"
   ]
 }
