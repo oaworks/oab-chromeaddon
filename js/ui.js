@@ -3,6 +3,10 @@ var key = localStorage.getItem("api_key");
 var serviceaddress = 'http://oabutton.cottagelabs.com';
 var apiaddress = serviceaddress + '/api';
 
+
+// Helpers
+function get_id(id) { return document.getElementById(id); }
+
 function get_active_tab() {
 	chrome.tabs.query({currentWindow: true, active: true}, function(tabs){
 	    console.log(tabs[0].url);
