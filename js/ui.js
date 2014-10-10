@@ -24,12 +24,25 @@ function get_active_tab() {
 function handle_data(data) {
 	var api_div = get_id('api_content');
 	console.log(data);
-	if (data.contentmine.metadata['title']){
-		api_div.innerHTML = '<h5>' + data.contentmine.metadata['title'] + '</h5>';
+	if (data.contentmine.metadata.hasOwnProperty('title')){
+		api_div.innerHTML = '<h5>' + data.contentmine.metadata['title'] + '</h5><ul><li>Blocked:' + data.blocked + '</li>' + '<li>Wishlist: ' + data.wishlist + '</li></ul>';
 	} else {
 		api_div.innerHTML = '<h5>About this article</h5><ul><li>Blocked: ' + data.blocked + '</li>' + '<li>Wishlist: ' + data.wishlist + '</li></ul>';
 	}
-	
+	display_metadata(data.contentmine.metadata);
+}
+
+function display_metadata(metadata){
+	var start = '<h5>Meta Data</h5><div class="collapse">';
+	var end = '</p>';
+	var meta_div = get_id('meta-div');
+	var meta_content = '';
+	for (var key in metadata) {
+		if (metadata.hasOwnProperty(key)) {
+	 		meta_content += '<p><strong>'+ key + '</strong>: ' + JSON.stringify(metadata[key]) + '</div>';
+		}
+	}
+	meta_div.innerHTML = start + meta_content + end;
 }
 
 function login_register_api_call(api_request, data) {
@@ -132,8 +145,16 @@ if (current_page == '/ui/login.html') {
     		if ('api_key' in localStorage) localStorage.removeItem('api_key');
     		window.location.href = 'login.html';
     	});
+
+    	document.getElementById('meta-collapse').addEventListener('click', function(){
+			var $this = $(this);
+			var $collapse = $this.closest('.collapse-group').find('.collapse');
+			$collapse.collapse('toggle');
+    	});
+
 		status_meta = status_request(localStorage.getItem('active_tab'), '/status');
 	});
+
 
 } else {
 	window.location.href = 'login.html';	
