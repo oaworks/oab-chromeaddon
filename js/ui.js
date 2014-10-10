@@ -24,12 +24,17 @@ function get_active_tab() {
 function handle_data(data) {
 	var api_div = get_id('api_content');
 	console.log(data);
-	if (data.contentmine.metadata.hasOwnProperty('title')){
-		api_div.innerHTML = '<h5>' + data.contentmine.metadata['title'] + '</h5><ul><li>Blocked:' + data.blocked + '</li>' + '<li>Wishlist: ' + data.wishlist + '</li></ul>';
+
+	if (data.contentmine.hasOwnProperty('errors')){
+		api_div.innerHTML = '<div class="alert alert-danger" role="alert"><p><strong>Error</strong> Are you sure this is an article page?</p>';
 	} else {
-		api_div.innerHTML = '<h5>About this article</h5><ul><li>Blocked: ' + data.blocked + '</li>' + '<li>Wishlist: ' + data.wishlist + '</li></ul>';
+		if (data.contentmine.metadata.hasOwnProperty('title')){
+			api_div.innerHTML = '<h5>' + data.contentmine.metadata['title'] + '</h5><ul><li>Blocked:' + data.blocked + '</li>' + '<li>Wishlist: ' + data.wishlist + '</li></ul>';
+		} else {
+			api_div.innerHTML = '<h5>About this article</h5><ul><li>Blocked: ' + data.blocked + '</li>' + '<li>Wishlist: ' + data.wishlist + '</li></ul>';
+		}
+		display_metadata(data.contentmine.metadata);
 	}
-	display_metadata(data.contentmine.metadata);
 }
 
 function display_metadata(metadata){
