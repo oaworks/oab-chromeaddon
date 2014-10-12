@@ -10,11 +10,37 @@ html {
   -webkit-text-size-adjust: 100%;
       -ms-text-size-adjust: 100%;
 }
+
 body {
   margin: 0;
-  width: 250px;
+  width: 300px;
   height: 500px;
 }
+.btn-group {
+    width: 100% !important;
+}
+.btn {
+  width: 50%;
+}
+.orange {
+  background-color: #F04717 !important; 
+  color: #fff !important;
+}
+.grp-padding{
+  padding-top: 5px;
+}
+.small-text {
+  font-size: 10px;
+  text-align: center;
+}
+.footer {
+  margin-top: 10px;
+  font-size: 12px;
+}
+.large-text {
+  font-size: 15px;
+}
+
 article,
 aside,
 details,

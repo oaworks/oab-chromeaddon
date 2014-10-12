@@ -8,7 +8,7 @@ var apiaddress = serviceaddress + '/api';
 function get_id(id) { return document.getElementById(id); }
 function get_value(id) { return document.getElementById(id).value; }
 
-function display_error(id, warning){
+function display_error(warning){
 	var warn_div = get_id('error');
 	var content = '<div class="alert alert-danger" role="alert">' + warning + '</div>';
 	warn_div.innerHTML = content;
@@ -23,7 +23,6 @@ function get_active_tab() {
 
 function handle_data(data) {
 	var api_div = get_id('api_content');
-	console.log(data);
 
 	if (data.contentmine.hasOwnProperty('errors')){
 		api_div.innerHTML = '<div class="alert alert-danger" role="alert"><p><strong>Error</strong> Are you sure this is an article page?</p>';
@@ -50,11 +49,8 @@ function display_metadata(metadata){
 	meta_div.innerHTML = start + meta_content + end;
 }
 
-function login_register_api_call(api_request, data) {
-	var response = ''
-	var api_key = '';
-	var username = '';
-    $.ajax({
+function oab_api_request(api_request, data, requestor) {
+	$.ajax({
         'type': 'POST',
         'url': apiaddress + api_request,
         'contentType': 'application/json; charset=utf-8',
@@ -63,35 +59,52 @@ function login_register_api_call(api_request, data) {
         'cache': false,
         'data': data,
         'success': function(data){
-    		localStorage.setItem('api_key', data.api_key);
-    		window.location.href = 'login.html'
+        	console.log(data);
+    		if (requestor == 'accounts') {
+    			localStorage.setItem('api_key', data.api_key);
+    			window.location.href = 'login.html'
+    		} else if (requestor == 'status') {
+    			handle_data(data);
+    		} else if (requestor == 'blocked') {
+    			localStorage.setItem('blocked_id', data.id);
+    		} else if (requestor == 'blockpost') {
+    			console.log('test')
+    		}
     	},
         'error': function(data){
-        	// Todo: Handle error here.
-        	console.log(data)
+    		console.log(data);
+    		display_error('API Error. Some more information will go here.');
     	},
     });
 }
 
-function status_request(url, api_request) {
-	$.ajax({
-        'type': 'POST',
-        'url': apiaddress + api_request,
-        'contentType': 'application/json; charset=utf-8',
-        'dataType': 'JSON',
-        'processData': false,
-        'cache': false,
-        'data': JSON.stringify({
+function scrape_emails() {
+	var all_emails = document.documentElement.innerHTML.toLowerCase().match(/([a-z0-9_\.\-\+]+@[a-z0-9_\-]+(\.[a-z0-9_\-]+)+)/g);
+	if (all_emails == null) {
+		return("emails", []);
+	} else {
+		var emails = [];
+
+		for (var i=0; i<all_emails.length; i++) {
+			var email = all_emails[i];
+			if (!((email.indexOf("@elsevier.com") > -1) || (email.indexOf("@nature.com") > -1) || (email.indexOf("@sciencemag.com") > -1) || (email.indexOf("@springer.com") > -1))) {
+				emails.push(email);
+			}
+		}
+
+		return("emails", emails);
+	}
+}
+
+function post_block_event(blockid) {
+	var story_text = get_value('story');
+	var block_request = '/blocked/' + blockid;
+	var data = JSON.stringify({
             'api_key': key,
-            'url': url
-        }),
-        'success': function(data){
-    		handle_data(data);
-    	},
-        'error': function(data){
-    		// Todo: Handle error here.
-    	},
-    });
+            'url': localStorage.getItem('active_tab'),
+            'story': story_text
+        });
+	oab_api_request(block_request, data, 'blockpost');
 }
 
 // Setup
@@ -116,9 +129,9 @@ if (current_page == '/ui/login.html') {
 		            'email': user_email,
 		            'password': user_password,
 		        });
-		    	login_register_api_call(api_request, data);
+		    	oab_api_request(api_request, data, 'accounts');
 	    	} else {
-	    		display_error('error', 'You must supply an email address and a password to login or register.');
+	    		display_error('You must supply an email address and a password to login or register.');
 	    	}
 
 	    	
@@ -135,11 +148,16 @@ if (current_page == '/ui/login.html') {
 		            'email': user_email,
 		            'password': user_password,
 		        });
-	    		login_register_api_call(api_request, data);
+	    		oab_api_request(api_request, data, 'accounts');
 	    	} else {
 	    		display_error('error', 'You must supply an email address and a password to login or register.');
 	    	}
 	    });
+
+	    // Handle forgot button
+	    document.getElementById('forgot').addEventListener('click', function(){
+			window.open("http://openaccessbutton.org/chrome/forgot_password");
+    	});
 
 	});
 
@@ -157,9 +175,44 @@ if (current_page == '/ui/login.html') {
 			$collapse.collapse('toggle');
     	});
 
-		status_meta = status_request(localStorage.getItem('active_tab'), '/status');
+    	document.getElementById('success').addEventListener('click', function(){
+    		post_block_event(localStorage.getItem('blocked_id'));
+    		window.location.href = 'success.html';
+    	});
+
+    	document.getElementById('failure').addEventListener('click', function(){
+    		post_block_event(localStorage.getItem('blocked_id'));
+    		var request = '/wishlist';
+	    	data = JSON.stringify({
+	            'api_key': key,
+	            'url': localStorage.getItem('active_tab')
+	        }),
+			oab_api_request(request, data, 'wishlist');
+    		window.location.href = 'failure.html';
+    	});
+
+    	if (!localStorage.getItem('blocked_id')) {
+    		// Blocked Event, if we've not already sent a block event.
+    		var blocked_request = '/blocked';
+	    	status_data = JSON.stringify({
+	            'api_key': key,
+	            'url': localStorage.getItem('active_tab')
+	        }),
+			oab_api_request(blocked_request, status_data, 'blocked');
+    	}
+
+    	// Get URL Status
+    	var status_request = '/status';
+    	status_data = JSON.stringify({
+            'api_key': key,
+            'url': localStorage.getItem('active_tab')
+        }),
+		oab_api_request(status_request, status_data, 'status');
 	});
 
+} else if (current_page == '/ui/success.html' && key) {
+
+} else if (current_page == '/ui/failure.html' && key) {
 
 } else {
 	window.location.href = 'login.html';	
