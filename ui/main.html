@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link href="../css/bootstrap.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+	<h5><img src="../img/oa16.png" align="right">Open Access Button</h5>
+	<div id="error"></div> 
+	<hr />
+	<div id="api_content">
+		<div class="progress">
+		  <div class="progress-bar progress-bar-striped active"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+		    <span>Mining Content</span>
+		  </div>
+		</div>
+	</div>
+	<div id="meta_content">
+        <div class="span4 collapse-group">
+           <div class="collapse" id="meta-div">No meta data</div>
+          <a class="btn" id="meta-collapse" href="#">View meta data &raquo;</a>
+        </div>
+	</div>
+	<hr />
+	<p class="large-text">With this research I could...</p>
+	<textarea class="form-control" rows="5" id="story"></textarea>
+	<p class="small-text">Your story is important to email the author, read why.</p>
+	<div class="btn-group input-group" data-toggle="buttons">
+		<button type="submit" class="btn btn-default orange" id="failure">I didn't get <br />access!</button>
+		<button type="submit" class="btn btn-default orange" id="success">I got <br />access!</button>
+	</div>
+	<table class="table footer">
+    	<tr><td>File a bug</td><td>Help</td><td>Privacy settings</td><td><a href="#" id="logout">Logout</td></tr>
+  	</table>
+</div>
+<script type="text/javascript" src="../js/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="../js/ui.js"></script>
+<script type="text/javascript" src="../js/bootstrap.min.js"></script>
+</body>
+</html>
