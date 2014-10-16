@@ -2,6 +2,7 @@
 <html>
 <head>
 	<link href="../css/bootstrap.css" rel="stylesheet">
+	<link href="../css/social-buttons.css" rel="stylesheet">
 </head>
 <body>
 <div class="container">
@@ -9,9 +10,17 @@
 	<div id="error"></div> 
 	<hr />
 	<p>That paper has been added to your wish list. We'll email you to let you know if we find any more information on it. You can help by sharing what you could do with it with your friends.</p>
-	<p> T | FB | G </p>
+	<button class="btn btn-facebook social" id="fb"><i class="fa fa-facebook"></i> F</button>
+	<button class="btn btn-twitter social" id="tw"><i class="fa fa-twitter"></i> T</button>
+	<button class="btn btn-google-plus social" id="gp"><i class="fa fa-google-plus"></i> G</button>
+	<hr />
 	<table class="table footer">
-    	<tr><td>File a bug</td><td>Help</td><td>Privacy settings</td><td><a href="#" id="logout">Logout</td></tr>
+    	<tr>
+    		<td><a href="http://openaccessbutton.org/chrome/bug">File a bug</a></td>
+    		<td><a href="http://openaccessbutton.org/chrome/help">Help</a></td>
+    		<td><a href="http://openaccessbutton.org/privacy">Privacy settings</a></td>
+    		<td><a href="#" id="logout">Logout</td>
+    	</tr>
   	</table>
 </div>
 <script type="text/javascript" src="../js/jquery-1.11.1.min.js"></script>

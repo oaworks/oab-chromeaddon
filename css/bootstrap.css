@@ -26,6 +26,9 @@ body {
   background-color: #F04717 !important; 
   color: #fff !important;
 }
+.lrgbutton {
+  height: 70px;
+}
 .grp-padding{
   padding-top: 5px;
 }
@@ -39,6 +42,24 @@ body {
 }
 .large-text {
   font-size: 15px;
+}
+button:hover {
+  opacity: 0.5;
+}
+.social {
+  width: 40px;
+}
+.left {
+  float: left;
+  width: 80%;
+}
+.right {
+  float: right;
+  width: 20%;
+  text-align: right;
+}
+.disabled {
+  opacity: 0.6
 }
 
 article,

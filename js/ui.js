@@ -28,15 +28,15 @@ function handle_data(data) {
 		api_div.innerHTML = '<div class="alert alert-danger" role="alert"><p><strong>Error</strong> Are you sure this is an article page?</p>';
 	} else {
 		if (data.contentmine.metadata.hasOwnProperty('title')){
-			api_div.innerHTML = '<h5>' + data.contentmine.metadata['title'] + '</h5><ul><li>Blocked:' + data.blocked + '</li>' + '<li>Wishlist: ' + data.wishlist + '</li></ul>';
+			api_div.innerHTML = '<h5>' + data.contentmine.metadata['title'] + '</h5><h5>Links</h5><p>Coming soon.</p><h5>Related papers</h5><p>Coming soon.</p><h5>Additional info</h5><ul><li>Blocked:' + data.blocked + '</li>' + '<li>Wishlist: ' + data.wishlist + '</li></ul>';
 		} else {
-			api_div.innerHTML = '<h5>About this article</h5><ul><li>Blocked: ' + data.blocked + '</li>' + '<li>Wishlist: ' + data.wishlist + '</li></ul>';
+			api_div.innerHTML = '<h5>Links</h5><p>Coming soon.</p><h5>Related papers</h5><p>Coming soon.</p><h5>Additional info</h5><ul><li>Blocked: ' + data.blocked + '</li>' + '<li>Wishlist: ' + data.wishlist + '</li></ul>';
 		}
 		display_metadata(data.contentmine.metadata);
 	}
 }
 
-function display_metadata(metadata){
+function display_metadata(metadata) {
 	var start = '<h5>Meta Data</h5><div class="collapse">';
 	var end = '</p>';
 	var meta_div = get_id('meta-div');
@@ -47,6 +47,22 @@ function display_metadata(metadata){
 		}
 	}
 	meta_div.innerHTML = start + meta_content + end;
+}
+
+function handle_api_error(data) {
+	var error_text = '';
+	if (data.hasOwnProperty('responseJSON') && data.responseJSON.hasOwnProperty('errors')) {
+		if (data.responseJSON['errors'][0] == '401: Unauthorized') {
+			error_text = 'Incorrect password.';
+		} else if (data.responseJSON['errors'][0] == '404: Not Found') {
+			error_text = 'Email address does not have an account.';
+		} else if (data.responseJSON['errors'][0] == 'username already exists') {
+			error_text = 'Email address already associated with an account.';
+		} else {
+			error_text = data.responseJSON['errors'][0];
+		}
+	}
+	display_error(error_text);
 }
 
 function oab_api_request(api_request, data, requestor) {
@@ -69,11 +85,13 @@ function oab_api_request(api_request, data, requestor) {
     			localStorage.setItem('blocked_id', data.id);
     		} else if (requestor == 'blockpost') {
     			console.log('test')
+    		} else if (requestor == 'wishlist'){
+    			window.location.href = 'failure.html';
     		}
     	},
         'error': function(data){
     		console.log(data);
-    		display_error('API Error. Some more information will go here.');
+    		handle_api_error(data)
     	},
     });
 }
@@ -162,7 +180,7 @@ if (current_page == '/ui/login.html') {
 	});
 
 } else if (current_page == '/ui/main.html' && key) {
-	window.addEventListener('load', function () {
+		window.addEventListener('load', function () {
 		// Handle the logout button.
 		document.getElementById('logout').addEventListener('click', function(){
     		if ('api_key' in localStorage) localStorage.removeItem('api_key');
@@ -177,7 +195,7 @@ if (current_page == '/ui/login.html') {
 
     	document.getElementById('success').addEventListener('click', function(){
     		post_block_event(localStorage.getItem('blocked_id'));
-    		window.location.href = 'success.html';
+ 			window.location.href = 'success.html';
     	});
 
     	document.getElementById('failure').addEventListener('click', function(){
@@ -188,7 +206,6 @@ if (current_page == '/ui/login.html') {
 	            'url': localStorage.getItem('active_tab')
 	        }),
 			oab_api_request(request, data, 'wishlist');
-    		window.location.href = 'failure.html';
     	});
 
     	if (!localStorage.getItem('blocked_id')) {
@@ -201,6 +218,21 @@ if (current_page == '/ui/login.html') {
 			oab_api_request(blocked_request, status_data, 'blocked');
     	}
 
+    	$('#story').keyup(function () {
+		    var left = 85 - $(this).val().length;
+		    if (left < 0) {
+		        left = 0;
+		    }
+		    $('#counter').text(left);
+		    var success = get_id('success');
+		    var failure = get_id('failure');
+		    if (left < 85) {
+		    	failure.disabled = false;
+		    } else {
+		    	failure.disabled = true;
+		    }
+		});
+
     	// Get URL Status
     	var status_request = '/status';
     	status_data = JSON.stringify({
@@ -211,9 +243,25 @@ if (current_page == '/ui/login.html') {
 	});
 
 } else if (current_page == '/ui/success.html' && key) {
-
+	document.getElementById('fb').addEventListener('click', function(){
+		chrome.tabs.create({'url': "https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fopenaccessbutton.org%2F"});
+	});
+	document.getElementById('tw').addEventListener('click', function(){
+		chrome.tabs.create({'url': "https://twitter.com/intent/tweet?text=See%20what%20I%E2%80%99d%20do%20with%20access%20to%20this%20research%20paper%20at%20https%3A%2F%2Fopenaccessbutton.org%2Fstory%2Ff5ff652c9d3f4677a06bb44b0f74fd9c%20via%20%40oa_button.&source=webclient"});
+	});
+	document.getElementById('gp').addEventListener('click', function(){
+		chrome.tabs.create({'url': "https://plus.google.com/share?url=https://openaccessbutton.org"});
+	});
 } else if (current_page == '/ui/failure.html' && key) {
-
+	document.getElementById('fb').addEventListener('click', function(){
+		chrome.tabs.create({'url': "https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fopenaccessbutton.org%2F"});
+	});
+	document.getElementById('tw').addEventListener('click', function(){
+		chrome.tabs.create({'url': "https://twitter.com/intent/tweet?text=See%20what%20I%E2%80%99d%20do%20with%20access%20to%20this%20research%20paper%20at%20https%3A%2F%2Fopenaccessbutton.org%2Fstory%2Ff5ff652c9d3f4677a06bb44b0f74fd9c%20via%20%40oa_button.&source=webclient"});
+	});
+	document.getElementById('gp').addEventListener('click', function(){
+		chrome.tabs.create({'url': "https://plus.google.com/share?url=https://openaccessbutton.org"});
+	});
 } else {
 	window.location.href = 'login.html';	
 }
