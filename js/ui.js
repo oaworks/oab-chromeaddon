@@ -3,6 +3,22 @@ var key = localStorage.getItem('api_key');
 var serviceaddress = 'http://oabutton.cottagelabs.com';
 var apiaddress = serviceaddress + '/api';
 
+// These listeners are active on all pages
+window.addEventListener('load', function () {
+	document.getElementById('bug').addEventListener('click', function(){
+		chrome.tabs.create({'url': "http:/openaccessbutton.org/chrome/bug"});
+	});
+	document.getElementById('help').addEventListener('click', function(){
+		chrome.tabs.create({'url': "http:/openaccessbutton.org/chrome/help"});
+	});
+	document.getElementById('privacy').addEventListener('click', function(){
+		chrome.tabs.create({'url': "http://openaccessbutton.org/user/" + localStorage.getItem('username')});
+	});
+	document.getElementById('logout').addEventListener('click', function(){
+		if ('api_key' in localStorage) localStorage.removeItem('api_key');
+		window.location.href = 'login.html';
+	});
+});
 
 // Helpers
 function get_id(id) { return document.getElementById(id); }
@@ -78,6 +94,7 @@ function oab_api_request(api_request, data, requestor) {
         	console.log(data);
     		if (requestor == 'accounts') {
     			localStorage.setItem('api_key', data.api_key);
+    			localStorage.setItem('username', get_value('user_email'));
     			window.location.href = 'login.html'
     		} else if (requestor == 'status') {
     			handle_data(data);
@@ -181,11 +198,6 @@ if (current_page == '/ui/login.html') {
 
 } else if (current_page == '/ui/main.html' && key) {
 		window.addEventListener('load', function () {
-		// Handle the logout button.
-		document.getElementById('logout').addEventListener('click', function(){
-    		if ('api_key' in localStorage) localStorage.removeItem('api_key');
-    		window.location.href = 'login.html';
-    	});
 
     	document.getElementById('meta-collapse').addEventListener('click', function(){
 			var $this = $(this);
@@ -207,6 +219,10 @@ if (current_page == '/ui/login.html') {
 	        }),
 			oab_api_request(request, data, 'wishlist');
     	});
+
+		document.getElementById('why').addEventListener('click', function(){
+			chrome.tabs.create({'url': "http://openaccessbutton.org/chrome/why"});
+		});
 
     	if (!localStorage.getItem('blocked_id')) {
     		// Blocked Event, if we've not already sent a block event.
