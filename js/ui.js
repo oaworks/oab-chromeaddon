@@ -14,6 +14,9 @@ window.addEventListener('load', function () {
 	document.getElementById('privacy').addEventListener('click', function(){
 		chrome.tabs.create({'url': "http://openaccessbutton.org/user/" + localStorage.getItem('username')});
 	});
+	document.getElementById('close').addEventListener('click', function(){
+		window.close();
+	});
 	document.getElementById('logout').addEventListener('click', function(){
 		if ('api_key' in localStorage) localStorage.removeItem('api_key');
 		window.location.href = 'login.html';
