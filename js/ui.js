@@ -12,7 +12,11 @@ window.addEventListener('load', function () {
 		chrome.tabs.create({'url': "http:/openaccessbutton.org/chrome/help"});
 	});
 	document.getElementById('privacy').addEventListener('click', function(){
-		chrome.tabs.create({'url': "http://openaccessbutton.org/user/" + localStorage.getItem('username')});
+		if (current_page == '/ui/login.html'){
+			chrome.tabs.create({'url': "http://openaccessbutton.org/privacy"});
+		} else {
+			chrome.tabs.create({'url': "http://openaccessbutton.org/user/" + localStorage.getItem('username')});
+		}
 	});
 	document.getElementById('close').addEventListener('click', function(){
 		window.close();
@@ -156,14 +160,20 @@ if (current_page == '/ui/login.html') {
 			window.location.href = '/ui/main.html';
 		}
 
+		document.getElementById('terms').addEventListener('click', function(){
+			chrome.tabs.create({'url': "http:/openaccessbutton.org/terms"});
+		});
+
 		// Handle the register button.
 	    document.getElementById('signup').addEventListener('click', function(){
 	    	var user_email = get_value('user_email');
 	    	var user_password = get_value('user_password');
 	    	var user_name = get_value('user_name');
 	    	var user_prof = get_value('user_prof');
+	    	var privacy = get_id('privacy_c');
+	    	var terms = get_id('terms_c');
 
-	    	if (user_email && user_password && user_name && user_prof){
+	    	if (user_email && user_password && user_name && user_prof && privacy.checked && terms.checked){
 	    		var api_request = '/register';
 		    	data = JSON.stringify({
 		            'email': user_email,
@@ -173,7 +183,7 @@ if (current_page == '/ui/login.html') {
 		        });
 		    	oab_api_request(api_request, data, 'accounts');
 	    	} else {
-	    		display_error('You must supply an email address, password, username and profession to register.');
+	    		display_error('You must supply an email address, password, username and profession to register. You must also agree to our privacy policy and terms by checking the boxes.');
 	    	}
 
 	    	
