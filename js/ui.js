@@ -1,6 +1,6 @@
 var current_page = location.pathname
 var key = localStorage.getItem('api_key');
-var serviceaddress = 'http://openaccessbutton.org';
+var serviceaddress = 'https://openaccessbutton.org';
 var apiaddress = serviceaddress + '/api';
 
 // These listeners are active on all pages
