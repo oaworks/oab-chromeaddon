@@ -1,6 +1,6 @@
 var current_page = location.pathname
 var key = localStorage.getItem('api_key');
-var serviceaddress = 'http://oabutton.cottagelabs.com';
+var serviceaddress = 'http://openaccessbutton.org';
 var apiaddress = serviceaddress + '/api';
 
 // These listeners are active on all pages
@@ -39,7 +39,6 @@ function display_error(warning){
 
 function get_active_tab() {
 	chrome.tabs.query({currentWindow: true, active: true}, function(tabs){
-	    console.log(tabs[0].url);
 	    localStorage.setItem('active_tab', tabs[0].url);
 	});
 }
@@ -98,7 +97,6 @@ function oab_api_request(api_request, data, requestor) {
         'cache': false,
         'data': data,
         'success': function(data){
-        	console.log(data);
     		if (requestor == 'accounts') {
     			localStorage.setItem('api_key', data.api_key);
     			localStorage.setItem('username', get_value('user_email'));
@@ -107,14 +105,11 @@ function oab_api_request(api_request, data, requestor) {
     			handle_data(data);
     		} else if (requestor == 'blocked') {
     			localStorage.setItem('blocked_id', data.id);
-    		} else if (requestor == 'blockpost') {
-    			console.log('test')
     		} else if (requestor == 'wishlist'){
     			window.location.href = 'failure.html';
     		}
     	},
         'error': function(data){
-    		console.log(data);
     		handle_api_error(data)
     	},
     });
