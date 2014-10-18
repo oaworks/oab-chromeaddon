@@ -265,24 +265,26 @@ if (current_page == '/ui/login.html') {
 	});
 
 } else if (current_page == '/ui/success.html' && key) {
+	var link = serviceaddress + '/story/' + localStorage.getItem('blocked_id');
 	document.getElementById('fb').addEventListener('click', function(){
-		chrome.tabs.create({'url': "https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fopenaccessbutton.org%2F"});
+		chrome.tabs.create({'url': "https://www.facebook.com/sharer/sharer.php?u=" + link});
 	});
 	document.getElementById('tw').addEventListener('click', function(){
-		chrome.tabs.create({'url': "https://twitter.com/intent/tweet?text=See%20what%20I%E2%80%99d%20do%20with%20access%20to%20this%20research%20paper%20at%20https%3A%2F%2Fopenaccessbutton.org%2Fstory%2Ff5ff652c9d3f4677a06bb44b0f74fd9c%20via%20%40oa_button.&source=webclient"});
+		chrome.tabs.create({'url': "https://twitter.com/intent/tweet?text=See%20what%20I%E2%80%99d%20do%20with%20access%20to%20this%20research%20paper%20at%20" + link + "%20via%20%40oa_button.&source=webclient"});
 	});
 	document.getElementById('gp').addEventListener('click', function(){
-		chrome.tabs.create({'url': "https://plus.google.com/share?url=https://openaccessbutton.org"});
+		chrome.tabs.create({'url': "https://plus.google.com/share?url=" + link});
 	});
 } else if (current_page == '/ui/failure.html' && key) {
+	var link = serviceaddress + '/story/' + localStorage.getItem('blocked_id');
 	document.getElementById('fb').addEventListener('click', function(){
-		chrome.tabs.create({'url': "https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fopenaccessbutton.org%2F"});
+		chrome.tabs.create({'url': "https://www.facebook.com/sharer/sharer.php?u=" + link});
 	});
 	document.getElementById('tw').addEventListener('click', function(){
-		chrome.tabs.create({'url': "https://twitter.com/intent/tweet?text=See%20what%20I%E2%80%99d%20do%20with%20access%20to%20this%20research%20paper%20at%20https%3A%2F%2Fopenaccessbutton.org%2Fstory%2Ff5ff652c9d3f4677a06bb44b0f74fd9c%20via%20%40oa_button.&source=webclient"});
+		chrome.tabs.create({'url': "https://twitter.com/intent/tweet?text=See%20what%20I%E2%80%99d%20do%20with%20access%20to%20this%20research%20paper%20at%20" + link + "%20via%20%40oa_button.&source=webclient"});
 	});
 	document.getElementById('gp').addEventListener('click', function(){
-		chrome.tabs.create({'url': "https://plus.google.com/share?url=https://openaccessbutton.org"});
+		chrome.tabs.create({'url': "https://plus.google.com/share?url=" + link});
 	});
 } else {
 	window.location.href = 'login.html';	
