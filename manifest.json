@@ -1,8 +1,8 @@
 {
-  "name": "OA Button",
+  "name": "Open Access Button",
   "version": "0.1",
   "manifest_version": 2,
-  "description": "OA Button extension, recording injustice for batman.",
+  "description": "Push Button. Get Research. Make Progress.",
   "icons": { "128": "img/oa128.png" },
   "browser_action": {
     "default_title": "OA Button",
