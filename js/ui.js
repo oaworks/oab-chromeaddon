@@ -160,12 +160,16 @@ if (current_page == '/ui/login.html') {
 	    document.getElementById('signup').addEventListener('click', function(){
 	    	var user_email = get_value('user_email');
 	    	var user_password = get_value('user_password');
+	    	var user_name = get_value('user_name');
+	    	var user_prof = get_value('user_prof');
 
 	    	if (user_email && user_password){
 	    		var api_request = '/register';
 		    	data = JSON.stringify({
 		            'email': user_email,
 		            'password': user_password,
+		            'username': user_name,
+		            'profession': user_prof,
 		        });
 		    	oab_api_request(api_request, data, 'accounts');
 	    	} else {
@@ -243,7 +247,6 @@ if (current_page == '/ui/login.html') {
 		        left = 0;
 		    }
 		    $('#counter').text(left);
-		    var success = get_id('success');
 		    var failure = get_id('failure');
 		    if (left < 85) {
 		    	failure.disabled = false;
