@@ -163,7 +163,7 @@ if (current_page == '/ui/login.html') {
 	    	var user_name = get_value('user_name');
 	    	var user_prof = get_value('user_prof');
 
-	    	if (user_email && user_password){
+	    	if (user_email && user_password && user_name && user_prof){
 	    		var api_request = '/register';
 		    	data = JSON.stringify({
 		            'email': user_email,
@@ -173,7 +173,7 @@ if (current_page == '/ui/login.html') {
 		        });
 		    	oab_api_request(api_request, data, 'accounts');
 	    	} else {
-	    		display_error('You must supply an email address and a password to login or register.');
+	    		display_error('You must supply an email address, password, username and profession to register.');
 	    	}
 
 	    	
