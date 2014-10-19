@@ -1,7 +1,7 @@
 {
   "name": "Open Access Button",
   "version": "0.3",
-  "manifest_version": 3,
+  "manifest_version": 2,
   "description": "Push Button. Get Research. Make Progress.",
   "icons": { "128": "img/oa70.png" },
   "browser_action": {
