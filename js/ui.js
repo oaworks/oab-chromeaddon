@@ -37,12 +37,6 @@ function display_error(warning){
 	warn_div.innerHTML = content;
 }
 
-function get_active_tab() {
-	chrome.tabs.query({currentWindow: true, active: true}, function(tabs){
-	    localStorage.setItem('active_tab', tabs[0].url);
-	});
-}
-
 function handle_data(data) {
 	var api_div = get_id('api_content');
 
@@ -50,7 +44,7 @@ function handle_data(data) {
 		api_div.innerHTML = '<div class="alert alert-danger" role="alert"><p><strong>Error</strong> Are you sure this is an article page?</p>';
 	} else {
 		if (data.contentmine.metadata.hasOwnProperty('title')){
-			api_div.innerHTML = '<h5>' + data.contentmine.metadata['title'] + '</h5><h5>Links</h5><p>Coming soon.</p><h5>Related papers</h5><p>Coming soon.</p><h5>Additional info</h5><ul><li>Blocked:' + data.blocked + '</li>' + '<li>Wishlist: ' + data.wishlist + '</li></ul>';
+			api_div.innerHTML = '<h5>' + data.contentmine.metadata['title'] + '</h5><h5>Links</h5><p><a target="_blank" href="http://scholar.google.co.uk/scholar?hl=en&q=' + encodeURI(data.contentmine.metadata['title']) + '">Google Scholar</a></p><h5>Related papers</h5><p>Coming soon.</p><h5>Additional info</h5><ul><li>Blocked:' + data.blocked + '</li>' + '<li>Wishlist: ' + data.wishlist + '</li></ul>';
 		} else {
 			api_div.innerHTML = '<h5>Links</h5><p>Coming soon.</p><h5>Related papers</h5><p>Coming soon.</p><h5>Additional info</h5><ul><li>Blocked: ' + data.blocked + '</li>' + '<li>Wishlist: ' + data.wishlist + '</li></ul>';
 		}
@@ -143,9 +137,6 @@ function post_block_event(blockid) {
         });
 	oab_api_request(block_request, data, 'blockpost');
 }
-
-// Setup
-get_active_tab()
 
 if (current_page == '/ui/login.html') {
 	window.addEventListener('load', function () {
