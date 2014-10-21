@@ -36,17 +36,97 @@ function display_error(warning){
 	var content = '<div class="alert alert-danger" role="alert">' + warning + '</div>';
 	warn_div.innerHTML = content;
 }
+function return_title(metas) {
+	for (i=0; i<metas.length; i++) { 
+      if (metas[i].getAttribute("name") == "citation_title") { 
+         return metas[i].getAttribute("content"); 
+      } 
+   }
+}
+
+function return_doi(metas) {
+	for (i=0; i<metas.length; i++) { 
+      if (metas[i].getAttribute("name") == "citation_doi") { 
+         return metas[i].getAttribute("content"); 
+      } 
+   }
+}
+
+function return_authors(metas) {
+	var authors = [];
+	for (i=0; i<metas.length; i++) { 
+      if (metas[i].getAttribute("name") == "citation_author") { 
+         authors.push(metas[i].getAttribute("content")); 
+      } 
+   }
+	return authors;
+}
+
+function return_journal(metas) {
+	for (i=0; i<metas.length; i++) { 
+      if (metas[i].getAttribute("name") == "citation_journal_title") { 
+         return metas[i].getAttribute("content"); 
+      } 
+   }
+}
+
+function store_article_info(title, doi, author, journal) {
+	localStorage.setItem('title', title);
+	localStorage.setItem('doi', doi);
+	localStorage.setItem('author', author);
+	localStorage.setItem('journal', journal);
+}
 
 function handle_data(data) {
 	var api_div = get_id('api_content');
+	var blocked = data.blocked;
+	var wishlist = data.wishlist;
 
 	if (data.contentmine.hasOwnProperty('errors')){
-		api_div.innerHTML = '<div class="alert alert-danger" role="alert"><p><strong>Error</strong> Are you sure this is an article page?</p>';
+		// Try to scrape DC.
+		chrome.extension.onMessage.addListener(
+			function(request, sender, sendResponse) {
+				var doc = (new DOMParser()).parseFromString(request.content, "text/html");
+				var title = return_title(doc.getElementsByTagName('meta'));
+				var doi = return_doi(doc.getElementsByTagName('meta'));
+				var author = return_authors(doc.getElementsByTagName('meta'));
+				var journal = return_journal(doc.getElementsByTagName('meta'));
+				store_article_info(title, doi, author, journal);
+
+				var block_request = '/blocked/' + localStorage.getItem('blocked_id');
+				var data = JSON.stringify({
+			            'api_key': key,
+			            'url': localStorage.getItem('active_tab'),
+			            'doi': doi,
+			            'author': author,
+			            'journal': journal
+			        });
+				oab_api_request(block_request, data, 'blockpost');
+
+				if (title) {
+					api_div.innerHTML = '<h5>' + title + '</h5><h5>Links</h5><p><a target="_blank" href="http://scholar.google.co.uk/scholar?hl=en&q=' + encodeURI(title) + '">Google Scholar</a></p><h5>Related papers</h5><p>No results available.</p><h5>Additional info</h5><ul><li>Blocked:' + blocked + '</li>' + '<li>Wishlist: ' + wishlist + '</li></ul>';
+				} else {
+					api_div.innerHTML = '<div class="alert alert-danger" role="alert"><p><strong>Error</strong> Are you sure this is an article page?</p>';
+				}
+
+		});
+
+		var tab_id = parseInt(localStorage.getItem('tab_id'), 10);
+		// Now inject a script onto the page
+		chrome.tabs.executeScript(tab_id, {
+		code: "chrome.extension.sendMessage({content: document.head.innerHTML}, function(response) { console.log('success'); });"
+		}, function() { console.log('done'); });
+
 	} else {
-		if (data.contentmine.metadata.hasOwnProperty('title')){
-			api_div.innerHTML = '<h5>' + data.contentmine.metadata['title'] + '</h5><h5>Links</h5><p><a target="_blank" href="http://scholar.google.co.uk/scholar?hl=en&q=' + encodeURI(data.contentmine.metadata['title']) + '">Google Scholar</a></p><h5>Related papers</h5><p>Coming soon.</p><h5>Additional info</h5><ul><li>Blocked:' + data.blocked + '</li>' + '<li>Wishlist: ' + data.wishlist + '</li></ul>';
+		if (data.hasOwnProperty('core') && data.core.hasOwnProperty('url')) {
+			var core_text = '<a target="_blank" href="' + data.core.url + '">' + data.core.title + '</a>';
 		} else {
-			api_div.innerHTML = '<h5>Links</h5><p>Coming soon.</p><h5>Related papers</h5><p>Coming soon.</p><h5>Additional info</h5><ul><li>Blocked: ' + data.blocked + '</li>' + '<li>Wishlist: ' + data.wishlist + '</li></ul>';
+			var core_text = 'No results available';
+		}
+		if (data.contentmine.metadata.hasOwnProperty('title')){
+			api_div.innerHTML = '<h5>' + data.contentmine.metadata['title'] + '</h5><h5>Links</h5><p><a target="_blank" href="http://scholar.google.co.uk/scholar?hl=en&q=' + encodeURI(data.contentmine.metadata['title']) + '">Google Scholar</a></p><h5>Related papers</h5><p>' + core_text + '</p><h5>Additional info</h5><ul><li>Blocked:' + data.blocked + '</li>' + '<li>Wishlist: ' + data.wishlist + '</li></ul>';
+		} else {
+			api_div.innerHTML = '<h5>Links</h5><p>No results available.</p><h5>Related papers</h5><p>No results available.</p><h5>Additional info</h5><ul><li>Blocked: ' + data.blocked + '</li>' + '<li>Wishlist: ' + data.wishlist + '</li></ul>';
 		}
 		display_metadata(data.contentmine.metadata);
 	}
@@ -74,11 +154,11 @@ function handle_api_error(data) {
 			error_text = 'Email address does not have an account.';
 		} else if (data.responseJSON['errors'][0] == 'username already exists') {
 			error_text = 'Email address already associated with an account.';
-		} else {
-			error_text = data.responseJSON['errors'][0];
 		}
 	}
-	display_error(error_text);
+	if (!error_text == ''){
+		display_error(error_text);
+	}
 }
 
 function oab_api_request(api_request, data, requestor) {
@@ -99,6 +179,16 @@ function oab_api_request(api_request, data, requestor) {
     			handle_data(data);
     		} else if (requestor == 'blocked') {
     			localStorage.setItem('blocked_id', data.id);
+
+    			// Get URL Status
+		    	var status_request = '/status';
+		    	status_data = JSON.stringify({
+		            'api_key': key,
+		            'url': localStorage.getItem('active_tab')
+		        }),
+				oab_api_request(status_request, status_data, 'status');
+
+
     		} else if (requestor == 'wishlist'){
     			window.location.href = 'failure.html';
     		}
@@ -235,7 +325,15 @@ if (current_page == '/ui/login.html') {
 	            'url': localStorage.getItem('active_tab')
 	        }),
 			oab_api_request(blocked_request, status_data, 'blocked');
-    	}
+    	} else {
+    		// Get URL Status
+	    	var status_request = '/status';
+	    	status_data = JSON.stringify({
+	            'api_key': key,
+	            'url': localStorage.getItem('active_tab')
+	        }),
+			oab_api_request(status_request, status_data, 'status');
+	    }
 
     	$('#story').keyup(function () {
 		    var left = 85 - $(this).val().length;
@@ -251,13 +349,6 @@ if (current_page == '/ui/login.html') {
 		    }
 		});
 
-    	// Get URL Status
-    	var status_request = '/status';
-    	status_data = JSON.stringify({
-            'api_key': key,
-            'url': localStorage.getItem('active_tab')
-        }),
-		oab_api_request(status_request, status_data, 'status');
 	});
 
 } else if (current_page == '/ui/success.html' && key) {
