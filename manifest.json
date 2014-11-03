@@ -6,7 +6,7 @@
   "icons": { "128": "img/oa70.png" },
   "browser_action": {
     "default_title": "OA Button",
-    "default_icon": "img/oa64.png",
+    "default_icon": "img/oa70.png",
     "default_popup": "ui/bootstrapper.html"
   },
   "permissions": [
