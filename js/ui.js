@@ -1,4 +1,4 @@
-var current_page = location.pathname
+var current_page = location.pathname;
 var key = localStorage.getItem('api_key');
 var serviceaddress = 'https://openaccessbutton.org';
 var apiaddress = serviceaddress + '/api';
@@ -156,7 +156,7 @@ function handle_api_error(data) {
 			error_text = 'Email address already associated with an account.';
 		}
 	}
-	if (!error_text == ''){
+	if (error_text != ''){
 		display_error(error_text);
 	}
 }
@@ -188,14 +188,13 @@ function oab_api_request(api_request, data, requestor) {
 		        }),
 				oab_api_request(status_request, status_data, 'status');
 
-
     		} else if (requestor == 'wishlist'){
     			window.location.href = 'failure.html';
     		}
     	},
         'error': function(data){
     		handle_api_error(data)
-    	},
+    	}
     });
 }
 
@@ -217,15 +216,38 @@ function scrape_emails() {
 	}
 }
 
+function get_loc(callback) {
+    if (navigator.geolocation) {
+        var opts = { timeout :10000 };        // 10 sec timeout
+        navigator.geolocation.getCurrentPosition(function(position){
+            var lat_lon = {geo: { lat: position.coords.latitude, lon: position.coords.longitude}};
+            callback(lat_lon)
+        }, function(){
+            display_error("Can't get location");
+            callback(null)
+        }, opts);
+    } else {
+        display_error("Browser does not support location");
+        callback(null)
+    }
+}
+
 function post_block_event(blockid) {
 	var story_text = get_value('story');
 	var block_request = '/blocked/' + blockid;
-	var data = JSON.stringify({
-            'api_key': key,
-            'url': localStorage.getItem('active_tab'),
-            'story': story_text
-        });
-	oab_api_request(block_request, data, 'blockpost');
+	var data = {
+            api_key: key,
+            url: localStorage.getItem('active_tab'),
+            story: story_text
+        };
+
+    // Add location data to story if possible
+    get_loc(function(pos_obj) {
+        if (pos_obj) {
+            data['location'] = pos_obj;
+        }
+        oab_api_request(block_request, JSON.stringify(data), 'blockpost');
+    });
 }
 
 if (current_page == '/ui/login.html') {
@@ -255,7 +277,7 @@ if (current_page == '/ui/login.html') {
 		            'email': user_email,
 		            'password': user_password,
 		            'username': user_name,
-		            'profession': user_prof,
+		            'profession': user_prof
 		        });
 		    	oab_api_request(api_request, data, 'accounts');
 	    	} else {
@@ -274,7 +296,7 @@ if (current_page == '/ui/login.html') {
 	    		var api_request = '/retrieve';
 		    	data = JSON.stringify({
 		            'email': user_email,
-		            'password': user_password,
+		            'password': user_password
 		        });
 	    		oab_api_request(api_request, data, 'accounts');
 	    	} else {
