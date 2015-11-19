@@ -223,16 +223,16 @@ function get_loc(callback) {
             var lat_lon = {geo: { lat: position.coords.latitude, lon: position.coords.longitude}};
             callback(lat_lon)
         }, function(){
-            display_error("Can't get location");
+            // Can't get location (permission denied or timed out)
             callback(null)
         }, opts);
     } else {
-        display_error("Browser does not support location");
+        // Browser does not support location
         callback(null)
     }
 }
 
-function post_block_event(blockid) {
+function post_block_event(blockid, callback) {
 	var story_text = get_value('story');
 	var block_request = '/blocked/' + blockid;
 	var data = {
@@ -247,6 +247,7 @@ function post_block_event(blockid) {
             data['location'] = pos_obj;
         }
         oab_api_request(block_request, JSON.stringify(data), 'blockpost');
+        callback()
     });
 }
 
@@ -283,8 +284,6 @@ if (current_page == '/ui/login.html') {
 	    	} else {
 	    		display_error('You must supply an email address, password, username and profession to register. You must also agree to our privacy policy and terms by checking the boxes.');
 	    	}
-
-	    	
 	    });
 
 	    // Handle the login button.
@@ -321,18 +320,20 @@ if (current_page == '/ui/login.html') {
     	});
 
     	document.getElementById('success').addEventListener('click', function(){
-    		post_block_event(localStorage.getItem('blocked_id'));
- 			window.location.href = 'success.html';
+    		post_block_event(localStorage.getItem('blocked_id'), function(){
+                window.location.href = 'success.html';
+            });
     	});
 
     	document.getElementById('failure').addEventListener('click', function(){
-    		post_block_event(localStorage.getItem('blocked_id'));
-    		var request = '/wishlist';
-	    	data = JSON.stringify({
-	            'api_key': key,
-	            'url': localStorage.getItem('active_tab')
-	        }),
-			oab_api_request(request, data, 'wishlist');
+    		post_block_event(localStorage.getItem('blocked_id'), function(){
+                var request = '/wishlist';
+                data = JSON.stringify({
+                    'api_key': key,
+                    'url': localStorage.getItem('active_tab')
+                }),
+                oab_api_request(request, data, 'wishlist');
+            });
     	});
 
 		document.getElementById('why').addEventListener('click', function(){
