@@ -3,10 +3,10 @@
   "version": "0.6",
   "manifest_version": 2,
   "description": "Push Button. Get Research. Make Progress.",
-  "icons": { "128": "img/oa70.png" },
+  "icons": { "128": "img/oa128.png" },
   "browser_action": {
     "default_title": "OA Button",
-    "default_icon": "img/oa70.png",
+    "default_icon": "img/oa128.png",
     "default_popup": "ui/bootstrapper.html"
   },
   "permissions": [
