@@ -312,6 +312,7 @@ if (current_page == '/ui/login.html') {
 
 } else if (current_page == '/ui/main.html' && key) {
 		window.addEventListener('load', function () {
+        document.getElementById('spin-greybox').style.visibility = 'hidden';
 
     	document.getElementById('meta-collapse').addEventListener('click', function(){
 			var $this = $(this);
@@ -320,13 +321,15 @@ if (current_page == '/ui/login.html') {
     	});
 
     	document.getElementById('success').addEventListener('click', function(){
+            document.getElementById('spin-greybox').style.visibility = 'visible';
     		post_block_event(localStorage.getItem('blocked_id'), function(){
                 window.location.href = 'success.html';
             });
     	});
 
     	document.getElementById('failure').addEventListener('click', function(){
-    		post_block_event(localStorage.getItem('blocked_id'), function(){
+            document.getElementById('spin-greybox').style.visibility = 'visible';
+            post_block_event(localStorage.getItem('blocked_id'), function(){
                 var request = '/wishlist';
                 data = JSON.stringify({
                     'api_key': key,
