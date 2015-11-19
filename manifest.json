@@ -1,6 +1,6 @@
 {
   "name": "Open Access Button",
-  "version": "0.6",
+  "version": "0.7",
   "manifest_version": 2,
   "description": "Push Button. Get Research. Make Progress.",
   "icons": { "128": "img/oa128.png" },

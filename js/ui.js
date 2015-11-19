@@ -18,9 +18,6 @@ window.addEventListener('load', function () {
 			chrome.tabs.create({'url': "http://openaccessbutton.org/user/" + localStorage.getItem('username')});
 		}
 	});
-	document.getElementById('close').addEventListener('click', function(){
-		window.close();
-	});
 	document.getElementById('logout').addEventListener('click', function(){
 		if ('api_key' in localStorage) localStorage.removeItem('api_key');
 		window.location.href = 'login.html';
@@ -104,7 +101,7 @@ function handle_data(data) {
 				oab_api_request(block_request, data, 'blockpost');
 
 				if (title) {
-					api_div.innerHTML = '<h5>' + title + '</h5><h5>Links</h5><p><a target="_blank" href="http://scholar.google.co.uk/scholar?hl=en&q=' + encodeURI(title) + '">Google Scholar</a></p><h5>Related papers</h5><p>No results available.</p><h5>Additional info</h5><ul><li>Blocked:' + blocked + '</li>' + '<li>Wishlist: ' + wishlist + '</li></ul>';
+					api_div.innerHTML = '<h5 class="title-emph">' + title + '</h5><h5>Links</h5><p><a target="_blank" href="http://scholar.google.co.uk/scholar?hl=en&q=' + encodeURI(title) + '">Google Scholar</a></p><h5>Related papers</h5><p>No results available.</p><h5>Additional info</h5><ul><li>Blocked:' + blocked + '</li>' + '<li>Wishlist: ' + wishlist + '</li></ul>';
 				} else {
 					api_div.innerHTML = '<div class="alert alert-danger" role="alert"><p><strong>Error</strong> Are you sure this is an article page?</p>';
 				}
