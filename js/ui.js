@@ -81,7 +81,7 @@ function handle_data(data) {
 
 	if (data.contentmine.hasOwnProperty('errors')){
 		// Try to scrape DC.
-		chrome.extension.onMessage.addListener(
+		chrome.runtime.onMessage.addListener(
 			function(request, sender, sendResponse) {
 				var doc = (new DOMParser()).parseFromString(request.content, "text/html");
 				var title = return_title(doc.getElementsByTagName('meta'));
@@ -111,7 +111,7 @@ function handle_data(data) {
 		var tab_id = parseInt(localStorage.getItem('tab_id'), 10);
 		// Now inject a script onto the page
 		chrome.tabs.executeScript(tab_id, {
-		code: "chrome.extension.sendMessage({content: document.head.innerHTML}, function(response) { console.log('success'); });"
+		code: "chrome.runtime.sendMessage({content: document.head.innerHTML}, function(response) { console.log('success'); });"
 		}, function() { console.log('done'); });
 
 	} else {
