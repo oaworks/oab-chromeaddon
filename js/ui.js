@@ -1,7 +1,5 @@
 var current_page = location.pathname;
 var key = localStorage.getItem('api_key');
-var serviceaddress = 'https://openaccessbutton.org';
-var apiaddress = serviceaddress + '/api';
 
 // These listeners are active on all pages
 window.addEventListener('load', function () {
@@ -27,44 +25,25 @@ window.addEventListener('load', function () {
 // Helpers
 function get_id(id) { return document.getElementById(id); }
 function get_value(id) { return document.getElementById(id).value; }
+function get_loc(callback) {
+    if (navigator.geolocation) {
+        var opts = { timeout :10000 };        // 10 sec timeout
+        navigator.geolocation.getCurrentPosition(function(position){
+            var lat_lon = {geo: { lat: position.coords.latitude, lon: position.coords.longitude}};
+            callback(lat_lon)
+        }, function(){
+            // Can't get location (permission denied or timed out)
+            callback(null)
+        }, opts);
+    } else {
+        // Browser does not support location
+        callback(null)
+    }
+}
 
 function display_error(warning){
 	var warn_div = get_id('error');
-	var content = '<div class="alert alert-danger" role="alert">' + warning + '</div>';
-	warn_div.innerHTML = content;
-}
-function return_title(metas) {
-	for (i=0; i<metas.length; i++) { 
-      if (metas[i].getAttribute("name") == "citation_title") { 
-         return metas[i].getAttribute("content"); 
-      } 
-   }
-}
-
-function return_doi(metas) {
-	for (i=0; i<metas.length; i++) { 
-      if (metas[i].getAttribute("name") == "citation_doi") { 
-         return metas[i].getAttribute("content"); 
-      } 
-   }
-}
-
-function return_authors(metas) {
-	var authors = [];
-	for (i=0; i<metas.length; i++) { 
-      if (metas[i].getAttribute("name") == "citation_author") { 
-         authors.push(metas[i].getAttribute("content")); 
-      } 
-   }
-	return authors;
-}
-
-function return_journal(metas) {
-	for (i=0; i<metas.length; i++) { 
-      if (metas[i].getAttribute("name") == "citation_journal_title") { 
-         return metas[i].getAttribute("content"); 
-      } 
-   }
+	warn_div.innerHTML = '<div class="alert alert-danger" role="alert">' + warning + '</div>';
 }
 
 function store_article_info(title, doi, author, journal) {
@@ -84,10 +63,11 @@ function handle_data(data) {
 		chrome.runtime.onMessage.addListener(
 			function(request, sender, sendResponse) {
 				var doc = (new DOMParser()).parseFromString(request.content, "text/html");
-				var title = return_title(doc.getElementsByTagName('meta'));
-				var doi = return_doi(doc.getElementsByTagName('meta'));
-				var author = return_authors(doc.getElementsByTagName('meta'));
-				var journal = return_journal(doc.getElementsByTagName('meta'));
+                var meta = doc.getElementsByTagName('meta');
+				var title = oab.return_title(meta);
+				var doi = oab.return_doi(meta);
+				var author = oab.return_authors(meta);
+				var journal = oab.return_journal(meta);
 				store_article_info(title, doi, author, journal);
 
 				var block_request = '/blocked/' + localStorage.getItem('blocked_id');
@@ -98,7 +78,7 @@ function handle_data(data) {
 			            'author': author,
 			            'journal': journal
 			        });
-				oab_api_request(block_request, data, 'blockpost');
+				oab.api_request(block_request, data, 'blockpost', process_api_response, handle_api_error);
 
 				if (title) {
 					api_div.innerHTML = '<h5 class="title-emph">' + title + '</h5><h5>Links</h5><p><a target="_blank" href="http://scholar.google.co.uk/scholar?hl=en&q=' + encodeURI(title) + '">Google Scholar</a></p><h5>Related papers</h5><p>No results available.</p><h5>Additional info</h5><ul><li>Blocked:' + blocked + '</li>' + '<li>Wishlist: ' + wishlist + '</li></ul>';
@@ -115,10 +95,11 @@ function handle_data(data) {
 		}, function() { console.log('done'); });
 
 	} else {
+		var core_text;
 		if (data.hasOwnProperty('core') && data.core.hasOwnProperty('url')) {
-			var core_text = '<a target="_blank" href="' + data.core.url + '">' + data.core.title + '</a>';
+			core_text = '<a target="_blank" href="' + data.core.url + '">' + data.core.title + '</a>';
 		} else {
-			var core_text = 'No results available';
+			core_text = 'No results available';
 		}
 		if (data.contentmine.metadata.hasOwnProperty('title')){
 			api_div.innerHTML = '<h5>' + data.contentmine.metadata['title'] + '</h5><h5>Links</h5><p><a target="_blank" href="http://scholar.google.co.uk/scholar?hl=en&q=' + encodeURI(data.contentmine.metadata['title']) + '">Google Scholar</a></p><h5>Related papers</h5><p>' + core_text + '</p><h5>Additional info</h5><ul><li>Blocked:' + data.blocked + '</li>' + '<li>Wishlist: ' + data.wishlist + '</li></ul>';
@@ -127,6 +108,41 @@ function handle_data(data) {
 		}
 		display_metadata(data.contentmine.metadata);
 	}
+}
+
+function handle_api_error(data) {
+    var error_text = '';
+    if (data.hasOwnProperty('responseJSON') && data.responseJSON.hasOwnProperty('errors')) {
+        if (data.responseJSON['errors'][0] == '401: Unauthorized') {
+            error_text = 'Incorrect password.';
+        } else if (data.responseJSON['errors'][0] == '404: Not Found') {
+            error_text = 'Email address does not have an account.';
+        } else if (data.responseJSON['errors'][0] == 'username already exists') {
+            error_text = 'Email address already associated with an account.';
+        }
+    }
+    if (error_text != ''){
+        display_error(error_text);
+    }
+}
+
+function post_block_event(blockid, callback) {
+    var story_text = get_value('story');
+    var block_request = '/blocked/' + blockid;
+    var data = {
+        api_key: key,
+        url: localStorage.getItem('active_tab'),
+        story: story_text
+    };
+
+    // Add location data to story if possible
+    get_loc(function(pos_obj) {
+        if (pos_obj) {
+            data['location'] = pos_obj;
+        }
+        oab.api_request(block_request, JSON.stringify(data), 'blockpost', process_api_response, handle_api_error);
+        callback()
+    });
 }
 
 function display_metadata(metadata) {
@@ -142,110 +158,27 @@ function display_metadata(metadata) {
 	meta_div.innerHTML = start + meta_content + end;
 }
 
-function handle_api_error(data) {
-	var error_text = '';
-	if (data.hasOwnProperty('responseJSON') && data.responseJSON.hasOwnProperty('errors')) {
-		if (data.responseJSON['errors'][0] == '401: Unauthorized') {
-			error_text = 'Incorrect password.';
-		} else if (data.responseJSON['errors'][0] == '404: Not Found') {
-			error_text = 'Email address does not have an account.';
-		} else if (data.responseJSON['errors'][0] == 'username already exists') {
-			error_text = 'Email address already associated with an account.';
-		}
-	}
-	if (error_text != ''){
-		display_error(error_text);
-	}
-}
+function process_api_response(data, requestor){
+    if (requestor == 'accounts') {
+        localStorage.setItem('api_key', data.api_key);
+        localStorage.setItem('username', get_value('user_email'));
+        window.location.href = 'login.html'
+    } else if (requestor == 'status') {
+        handle_data(data);
+    } else if (requestor == 'blocked') {
+        localStorage.setItem('blocked_id', data.id);
 
-function oab_api_request(api_request, data, requestor) {
-	$.ajax({
-        'type': 'POST',
-        'url': apiaddress + api_request,
-        'contentType': 'application/json; charset=utf-8',
-        'dataType': 'JSON',
-        'processData': false,
-        'cache': false,
-        'data': data,
-        'success': function(data){
-    		if (requestor == 'accounts') {
-    			localStorage.setItem('api_key', data.api_key);
-    			localStorage.setItem('username', get_value('user_email'));
-    			window.location.href = 'login.html'
-    		} else if (requestor == 'status') {
-    			handle_data(data);
-    		} else if (requestor == 'blocked') {
-    			localStorage.setItem('blocked_id', data.id);
+        // Get URL Status
+        var status_request = '/status';
+        status_data = JSON.stringify({
+            'api_key': key,
+            'url': localStorage.getItem('active_tab')
+        }),
+            oab.api_request(status_request, status_data, 'status', process_api_response, handle_api_error);
 
-    			// Get URL Status
-		    	var status_request = '/status';
-		    	status_data = JSON.stringify({
-		            'api_key': key,
-		            'url': localStorage.getItem('active_tab')
-		        }),
-				oab_api_request(status_request, status_data, 'status');
-
-    		} else if (requestor == 'wishlist'){
-    			window.location.href = 'failure.html';
-    		}
-    	},
-        'error': function(data){
-    		handle_api_error(data)
-    	}
-    });
-}
-
-function scrape_emails() {
-	var all_emails = document.documentElement.innerHTML.toLowerCase().match(/([a-z0-9_\.\-\+]+@[a-z0-9_\-]+(\.[a-z0-9_\-]+)+)/g);
-	if (all_emails == null) {
-		return("emails", []);
-	} else {
-		var emails = [];
-
-		for (var i=0; i<all_emails.length; i++) {
-			var email = all_emails[i];
-			if (!((email.indexOf("@elsevier.com") > -1) || (email.indexOf("@nature.com") > -1) || (email.indexOf("@sciencemag.com") > -1) || (email.indexOf("@springer.com") > -1))) {
-				emails.push(email);
-			}
-		}
-
-		return("emails", emails);
-	}
-}
-
-function get_loc(callback) {
-    if (navigator.geolocation) {
-        var opts = { timeout :10000 };        // 10 sec timeout
-        navigator.geolocation.getCurrentPosition(function(position){
-            var lat_lon = {geo: { lat: position.coords.latitude, lon: position.coords.longitude}};
-            callback(lat_lon)
-        }, function(){
-            // Can't get location (permission denied or timed out)
-            callback(null)
-        }, opts);
-    } else {
-        // Browser does not support location
-        callback(null)
+    } else if (requestor == 'wishlist'){
+        window.location.href = 'failure.html';
     }
-}
-
-function post_block_event(blockid, callback) {
-	var story_text = get_value('story');
-	var block_request = '/blocked/' + blockid;
-	var data = {
-            api_key: key,
-            url: localStorage.getItem('active_tab'),
-            story: story_text
-        };
-
-    // Add location data to story if possible
-    get_loc(function(pos_obj) {
-        if (pos_obj) {
-            data['location'] = pos_obj;
-        }
-        oab_api_request(block_request, JSON.stringify(data), 'blockpost');
-        callback()
-    });
 }
 
 if (current_page == '/ui/login.html') {
@@ -277,7 +210,7 @@ if (current_page == '/ui/login.html') {
 		            'username': user_name,
 		            'profession': user_prof
 		        });
-		    	oab_api_request(api_request, data, 'accounts');
+		    	oab.api_request(api_request, data, 'accounts', process_api_response, handle_api_error);
 	    	} else {
 	    		display_error('You must supply an email address, password, username and profession to register. You must also agree to our privacy policy and terms by checking the boxes.');
 	    	}
@@ -294,7 +227,7 @@ if (current_page == '/ui/login.html') {
 		            'email': user_email,
 		            'password': user_password
 		        });
-	    		oab_api_request(api_request, data, 'accounts');
+	    		oab.api_request(api_request, data, 'accounts', process_api_response, handle_api_error);
 	    	} else {
 	    		display_error('error', 'You must supply an email address and a password to login or register.');
 	    	}
@@ -304,7 +237,6 @@ if (current_page == '/ui/login.html') {
 	    document.getElementById('forgot').addEventListener('click', function(){
 			window.open("http://openaccessbutton.org/chrome/forgot_password");
     	});
-
 	});
 
 } else if (current_page == '/ui/main.html' && key) {
@@ -332,7 +264,7 @@ if (current_page == '/ui/login.html') {
                     'api_key': key,
                     'url': localStorage.getItem('active_tab')
                 }),
-                oab_api_request(request, data, 'wishlist');
+                oab.api_request(request, data, 'wishlist', process_api_response, handle_api_error);
             });
     	});
 
@@ -347,7 +279,7 @@ if (current_page == '/ui/login.html') {
 	            'api_key': key,
 	            'url': localStorage.getItem('active_tab')
 	        }),
-			oab_api_request(blocked_request, status_data, 'blocked');
+			oab.api_request(blocked_request, status_data, 'blocked', process_api_response, handle_api_error);
     	} else {
     		// Get URL Status
 	    	var status_request = '/status';
@@ -355,7 +287,7 @@ if (current_page == '/ui/login.html') {
 	            'api_key': key,
 	            'url': localStorage.getItem('active_tab')
 	        }),
-			oab_api_request(status_request, status_data, 'status');
+			oab.api_request(status_request, status_data, 'status', process_api_response, handle_api_error);
 	    }
 
     	$('#story').keyup(function () {
