@@ -27,6 +27,14 @@
     <p id="counter" class="large-text right">85</p>
     <textarea class="form-control" rows="3" id="story" maxlength=85 placeholder="Please finish the sentence above. E.g 'understand my disease', 'learn more about this aspect of culture'"></textarea>
     <p class="small-text">Your story is important to email the author, read <a href="#" id="why">why</a>.</p>
+    <div class="auth_email_group">
+        <div class="checkbox">
+            <label><input type="checkbox" value="" id="email_auth_check">Email the author?</label>
+        </div>
+        <div class="span4 collapse-group">
+            <input type="email" class="form-control collapse" id="auth_email" placeholder="Enter author's email">
+        </div>
+    </div>
     <div class="btn-group input-group" data-toggle="buttons">
         <button type="submit" class="btn btn-default orange lrgbutton" id="success">I got access!</button>
         <button type="submit" class="btn btn-default orange lrgbutton" id="failure" disabled>I didn't get <br />access!<p class="small-text">Add to wish list</p></button>

@@ -142,6 +142,11 @@ function post_block_event(blockid, callback) {
         url: localStorage.getItem('active_tab'),
         story: story_text
     };
+    // Add author email if provided so oabutton can email them //todo: parse from page & populate field
+    var given_auth_email = get_value('auth_email');
+    if (given_auth_email) {
+        data['email'] = [given_auth_email]
+    }
 
     // Add location data to story if possible
     get_loc(function (pos_obj) {
@@ -257,6 +262,14 @@ if (current_page == '/ui/login.html') {
             $collapse.collapse('toggle');
         });
 
+        document.getElementById('email_auth_check').addEventListener('change', function () {
+            if (this.checked){
+                $('#auth_email').collapse('show')
+            } else {
+                $('#auth_email').collapse('hide')
+            }
+        });
+
         document.getElementById('success').addEventListener('click', function () {
             document.getElementById('spin-greybox').style.visibility = 'visible';
             post_block_event(localStorage.getItem('blocked_id'), function () {
@@ -311,7 +324,6 @@ if (current_page == '/ui/login.html') {
                 failure.disabled = true;
             }
         });
-
     });
 
 } else if (current_page == '/ui/success.html' && key) {
