@@ -21,6 +21,7 @@ var oab = {
                 failure_callback(data)
             }
         });
+        console.log(request_type + JSON.stringify(data));
     },
 
     ///////////////////////////////////
