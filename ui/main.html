@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Open Access Button</title>
+    <meta charset="UTF-8">
+    <link href="../css/bootstrap.css" rel="stylesheet">
+    <link href="../css/oa.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <h5 style="color: #F04717"><img src="../img/oa25.png">Open Access Button</h5>
+    <div id="error"></div>
+    <div id="api_content">
+        <div class="progress">
+            <div class="progress-bar progress-bar-striped active"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+                <span>Loading Content</span>
+            </div>
+        </div>
+    </div>
+    <div id="meta_content">
+        <div class="span4 collapse-group">
+            <a class="btn btn-text" id="meta-collapse" href="#">View meta data &raquo;</a>
+            <div class="collapse" id="meta-div">No meta data</div>
+        </div>
+    </div>
+    <p class="large-text left">With this research I could...</p>
+    <p id="counter" class="large-text right">85</p>
+    <textarea class="form-control" rows="3" id="story" maxlength=85 placeholder="Please finish the sentence above. E.g 'understand my disease', 'learn more about this aspect of culture'"></textarea>
+    <p class="small-text">Your story is important to email the author, read <a href="#" id="why">why</a>.</p>
+    <div class="auth_email_group">
+        <div class="checkbox">
+            <label><input type="checkbox" value="" id="email_auth_check">Email the author?</label>
+        </div>
+        <div class="span4 collapse-group">
+            <input type="email" class="form-control collapse" id="auth_email" placeholder="Enter author's email">
+        </div>
+    </div>
+    <div class="btn-group input-group" data-toggle="buttons">
+        <button type="submit" class="btn btn-default orange lrgbutton" id="success">I got access!</button>
+        <button type="submit" class="btn btn-default orange lrgbutton" id="failure" disabled>I didn't get <br />access!<p class="small-text">Add to wish list</p></button>
+    </div>
+    <table class="table footer">
+        <tr>
+            <td><a href="#" id="bug">File a bug</a></td>
+            <td><a href="#" id="help">Help</a></td>
+            <td><a href="#" id="privacy">Privacy settings</a></td>
+            <td><a href="#" id="logout">Logout</a></td>
+        </tr>
+    </table>
+</div>
+<div id="spin-greybox">
+    <div class="spinner"></div>
+</div>
+<script type="text/javascript" src="../js/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="../js/oab.js"></script>
+<script type="text/javascript" src="../js/ui.js"></script>
+<script type="text/javascript" src="../js/bootstrap.min.js"></script>
+</body>
+</html>
