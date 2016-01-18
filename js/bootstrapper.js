@@ -9,6 +9,6 @@ chrome.tabs.query({currentWindow: true, active: true}, function(tabs){
 	}
     localStorage.setItem('active_tab', tabs[0].url);
     localStorage.setItem('tab_id', tabs[0].id);
-    console.log(localStorage.getItem('tab_id'));
-    chrome.tabs.create({'url': chrome.extension.getURL('ui/login.html')});
+    document.getElementById('oabutton_frame').src = chrome.extension.getURL('ui/login.html');
+    document.getElementById('placeholder').style.display = 'none';
 });
