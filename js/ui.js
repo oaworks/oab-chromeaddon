@@ -62,7 +62,7 @@ function handle_data(data) {
     var blocked = data.blocked;
     var wishlist = data.wishlist;
 
-    if (data.contentmine.hasOwnProperty('errors')) {
+    if (data.hasOwnProperty('contentmine') && data.contentmine.hasOwnProperty('errors')) {
         // Try to scrape DC.
         chrome.runtime.onMessage.addListener(
             function (request, sender, sendResponse) {
@@ -109,12 +109,13 @@ function handle_data(data) {
         } else {
             core_text = 'No results available';
         }
-        if (data.contentmine.metadata.hasOwnProperty('title')) {
+        if (data.hasOwnProperty('contentmine') && data.contentmine.hasOwnProperty('metadata') && data.contentmine.metadata.hasOwnProperty('title')) {
             api_div.innerHTML = '<h5>' + data.contentmine.metadata['title'] + '</h5><h5>Links</h5><p><a target="_blank" href="http://scholar.google.co.uk/scholar?hl=en&q=' + encodeURI(data.contentmine.metadata['title']) + '">Google Scholar</a></p><h5>Related papers</h5><p>' + core_text + '</p><h5>Additional info</h5><ul><li>Blocked:' + data.blocked + '</li>' + '<li>Wishlist: ' + data.wishlist + '</li></ul>';
+            display_metadata(data.contentmine.metadata);
         } else {
             api_div.innerHTML = '<h5>Links</h5><p>No results available.</p><h5>Related papers</h5><p>No results available.</p><h5>Additional info</h5><ul><li>Blocked: ' + data.blocked + '</li>' + '<li>Wishlist: ' + data.wishlist + '</li></ul>';
+            display_metadata({})
         }
-        display_metadata(data.contentmine.metadata);
     }
 }
 
