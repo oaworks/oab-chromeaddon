@@ -5,6 +5,13 @@ var oab = {
     ///////////////////////////////////
     // Using the oab api
     ///////////////////////////////////
+
+    // Tell the API which plugin version is in use for each POST
+    plugin_version_sign: function(pdata) {
+        var manifest = chrome.runtime.getManifest();
+        return $.extend(pdata, { plugin: manifest['version_name'] } );
+    },
+
     api_request: function(request_type, data, requestor, success_callback, failure_callback) {
         $.ajax({
             'type': 'POST',
@@ -13,7 +20,7 @@ var oab = {
             'dataType': 'JSON',
             'processData': false,
             'cache': false,
-            'data': data,
+            'data': JSON.stringify(this.plugin_version_sign(data)),
             'success': function(data){
                 success_callback(data, requestor)
             },
@@ -47,7 +54,8 @@ var oab = {
         var authors = [];
         for (i=0; i<metas.length; i++) {
             if (metas[i].getAttribute("name") == "citation_author") {
-                authors.push(metas[i].getAttribute("content"));
+                var authname = metas[i].getAttribute("content");
+                authors.push( { name: authname } );
             }
         }
         return authors;
@@ -56,7 +64,8 @@ var oab = {
     return_journal: function(metas) {
         for (i=0; i<metas.length; i++) {
             if (metas[i].getAttribute("name") == "citation_journal_title") {
-                return metas[i].getAttribute("content");
+                var jtitle = metas[i].getAttribute("content");
+                return { journal: { name: jtitle } }
             }
         }
     },

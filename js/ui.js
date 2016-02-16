@@ -75,7 +75,7 @@ function handle_data(data) {
                 store_article_info(title, doi, author, journal);
 
                 var block_request = '/blocked/' + localStorage.getItem('blocked_id');
-                var data = JSON.stringify({             // This is best-case (assume getting all info) for now.
+                var data = {             // This is best-case (assume getting all info) for now.
                     'api_key': key,
                     'url': localStorage.getItem('active_tab'),
                     'metadata': {
@@ -84,7 +84,7 @@ function handle_data(data) {
                         'journal': journal,
                         'identifier': [{'type': 'doi', 'id': doi}]
                     }
-                });
+                };
                 oab.api_request(block_request, data, 'blockpost', process_api_response, handle_api_error);
 
                 if (title) {
@@ -154,7 +154,7 @@ function post_block_event(blockid, callback) {
         if (pos_obj) {
             data['location'] = pos_obj;
         }
-        oab.api_request(block_request, JSON.stringify(data), 'blockpost', process_api_response, handle_api_error);
+        oab.api_request(block_request, data, 'blockpost', process_api_response, handle_api_error);
         callback()
     });
 }
@@ -184,10 +184,10 @@ function process_api_response(data, requestor) {
 
         // Get URL Status
         var status_request = '/status';
-        status_data = JSON.stringify({
+        status_data = {
             'api_key': key,
             'url': localStorage.getItem('active_tab')
-        }),
+        },
             oab.api_request(status_request, status_data, 'status', process_api_response, handle_api_error);
 
     } else if (requestor == 'wishlist') {
@@ -218,12 +218,12 @@ if (current_page == '/ui/login.html') {
 
             if (user_email && user_password && user_name && user_prof && privacy.checked && terms.checked) {
                 var api_request = '/register';
-                data = JSON.stringify({
+                data = {
                     'email': user_email,
                     'password': user_password,
                     'username': user_name,
                     'profession': user_prof
-                });
+                };
                 oab.api_request(api_request, data, 'accounts', process_api_response, handle_api_error);
             } else {
                 display_error('You must supply an email address, password, username and profession to register. You must also agree to our privacy policy and terms by checking the boxes.');
@@ -237,10 +237,10 @@ if (current_page == '/ui/login.html') {
 
             if (user_email && user_password) {
                 var api_request = '/retrieve';
-                data = JSON.stringify({
+                data = {
                     'email': user_email,
                     'password': user_password
-                });
+                };
                 oab.api_request(api_request, data, 'accounts', process_api_response, handle_api_error);
             } else {
                 display_error('error', 'You must supply an email address and a password to login or register.');
@@ -282,10 +282,10 @@ if (current_page == '/ui/login.html') {
             document.getElementById('spin-greybox').style.visibility = 'visible';
             post_block_event(localStorage.getItem('blocked_id'), function () {
                 var request = '/wishlist';
-                data = JSON.stringify({
+                data = {
                     'api_key': key,
                     'url': localStorage.getItem('active_tab')
-                }),
+                },
                     oab.api_request(request, data, 'wishlist', process_api_response, handle_api_error);
             });
         });
@@ -297,18 +297,18 @@ if (current_page == '/ui/login.html') {
         if (!localStorage.getItem('blocked_id')) {
             // Blocked Event, if we've not already sent a block event.
             var blocked_request = '/blocked';
-            status_data = JSON.stringify({
+            status_data = {
                 'api_key': key,
                 'url': localStorage.getItem('active_tab')
-            }),
+            },
                 oab.api_request(blocked_request, status_data, 'blocked', process_api_response, handle_api_error);
         } else {
             // Get URL Status
             var status_request = '/status';
-            status_data = JSON.stringify({
+            status_data = {
                 'api_key': key,
                 'url': localStorage.getItem('active_tab')
-            }),
+            },
                 oab.api_request(status_request, status_data, 'status', process_api_response, handle_api_error);
         }
 
