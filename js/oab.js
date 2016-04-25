@@ -1,5 +1,5 @@
-var serviceaddress = 'https://openaccessbutton.org';
-var apiaddress = serviceaddress + '/api';
+var apiaddress = 'https://api.opendatabutton.org';
+var siteaddress = "https://opendatabutton.org";
 
 var oab = {
     ///////////////////////////////////
@@ -22,7 +22,7 @@ var oab = {
             'cache': false,
             'data': JSON.stringify(this.plugin_version_sign(data)),
             'success': function(data){
-                success_callback(data, requestor)
+                success_callback(data['data'], requestor)
             },
             'error': function(data){
                 failure_callback(data)
@@ -61,11 +61,22 @@ var oab = {
         return authors;
     },
 
+    return_author_email: function(metas) {
+        var authors = [];
+        for (i=0; i<metas.length; i++) {
+            if (metas[i].getAttribute("name") == "citation_author_email") {
+                var email = metas[i].getAttribute("content");
+                authors.push(email);
+            }
+        }
+        return authors;
+    },
+
     return_journal: function(metas) {
         for (i=0; i<metas.length; i++) {
             if (metas[i].getAttribute("name") == "citation_journal_title") {
                 var jtitle = metas[i].getAttribute("content");
-                return { journal: { name: jtitle } }
+                return { name: jtitle }
             }
         }
     },

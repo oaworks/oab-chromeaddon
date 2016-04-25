@@ -1,3 +1,69 @@
+body {
+    margin: 0;
+    width: 300px;
+    height: 500px;
+}
+p {
+    margin: 0 0 10px;
+    font-size: 10px;
+}
+.btn-group {
+    width: 100% !important;
+}
+.orange {
+    background-color: #F04717 !important;
+    color: #fff !important;
+}
+.lrgbutton {
+    height: 70px;
+}
+.grp-padding{
+    padding-top: 5px;
+}
+.small-text {
+    font-size: 10px;
+    text-align: center;
+}
+.footer {
+    margin-top: 10px;
+    font-size: 12px;
+}
+.large-text {
+    font-size: 15px;
+}
+button:hover {
+    opacity: 0.5;
+}
+.social {
+    width: 40px;
+}
+.left {
+    float: left;
+    width: 80%;
+}
+.right {
+    float: right;
+    width: 20%;
+    text-align: right;
+}
+.disabled {
+    opacity: 0.6
+}
+.icon-grey-link {
+    padding-top: 10px;
+    opacity:0.5;
+    filter:alpha(opacity=50); /* For IE8 and earlier */
+}
+a:hover > i.icon-grey-link {
+    padding-top: 10px;
+    opacity:1;
+    filter:alpha(opacity=100); /* For IE8 and earlier */
+}
+.alert {
+    padding: 10px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
 .padded-img {
     padding-top: 20px;
 }
@@ -15,6 +81,11 @@ ul {
 
 .med-text{
     font-size: 12px;
+}
+
+.anchored-bottom {
+    position:absolute;
+    bottom: 0;
 }
 
 .container {
@@ -84,5 +155,5 @@ div .auth_email_group {
           -webkit-transform: scale(1.0);
           transform: scale(1.0);
           opacity: 0;
-      }
+    }
 }
