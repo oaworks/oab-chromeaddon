@@ -105,13 +105,13 @@ function handle_data(data) {
     var api_div = get_id('api_content');
 
     if (data.hasOwnProperty('provided')) {
-        // we have found the data; send the user to its url
+        // we have found the article; send the user to its url
         hide_email_fields();
         $('#story_div').collapse('hide');
         get_id('submit').disabled = false;
 
-        api_div.innerHTML = '<h4 class="title">We found this data!</h4>';
-        set_button("See your data", data.provided.url, false);
+        api_div.innerHTML = '<h4 class="title">We found this article!</h4>';
+        set_button("See your article", data.provided.url, false);
     } else if (data.hasOwnProperty('request')) {
         // submit user story and redirect to request URL (add story to existing request)
         hide_email_fields();
@@ -119,7 +119,7 @@ function handle_data(data) {
         set_button("Submit and view request", siteaddress + "/request/" + data.request, true);
     } else {
         // submit user story with email and title fields (create new request)
-        api_div.innerHTML = '<h4 class="title">This data isn\'t available.</h4><p>You can submit a request to the author.</p>';
+        api_div.innerHTML = '<h4 class="title">This article isn\'t available.</h4><p>You can submit a request to the author.</p>';
         set_button("Send a new request", undefined, true);
 
         // Extract more metadata from the page to augment the blocked request FIXME: This is a strange way of doing it.
@@ -228,7 +228,7 @@ if (current_page == '/ui/login.html') {
         });
 
         document.getElementById('acc').addEventListener('click', function () {
-            chrome.tabs.create({'url': "https://opendatabutton.org/account"});
+            chrome.tabs.create({'url': "https://openaccessbutton.org/account"});
         });
 
         // Handle the register button.
@@ -276,7 +276,7 @@ if (current_page == '/ui/login.html') {
         document.getElementById('spin-greybox').style.visibility = 'hidden';
         
         document.getElementById('why').addEventListener('click', function () {
-            chrome.tabs.create({'url': "https://opendatabutton.org/why"});
+            chrome.tabs.create({'url': "https://openaccessbutton.org/why"});
         });
 
         chrome.tabs.query({currentWindow: true, active: true}, function(tabs) {
