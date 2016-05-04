@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Open Access Button</title>
+    <title>Open Data Button</title>
     <meta charset="UTF-8">
-    <link href="../css/bootstrap.css" rel="stylesheet">
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
     <link href="../css/oa.css" rel="stylesheet">
 </head>
 <body>
@@ -17,33 +17,25 @@
             </div>
         </div>
     </div>
-    <div id="meta_content">
-        <div class="span4 collapse-group">
-            <a class="btn btn-text" id="meta-collapse" href="#">View meta data &raquo;</a>
-            <div class="collapse" id="meta-div">No meta data</div>
-        </div>
+    <div class="span4 collapse-group auth_email_group">
+        <input type="email" class="auth_email_group form-control collapse in" id="auth_email" placeholder="Enter author's email">
     </div>
-    <p class="large-text left">With this research I could...</p>
-    <p id="counter" class="large-text right">85</p>
-    <textarea class="form-control" rows="3" id="story" maxlength=85 placeholder="Please finish the sentence above. E.g 'understand my disease', 'learn more about this aspect of culture'"></textarea>
-    <p class="small-text">Your story is important to email the author, read <a href="#" id="why">why</a>.</p>
-    <div class="auth_email_group">
-        <div class="checkbox">
-            <label><input type="checkbox" value="" id="email_auth_check">Email the author?</label>
-        </div>
-        <div class="span4 collapse-group">
-            <input type="email" class="form-control collapse" id="auth_email" placeholder="Enter author's email">
-        </div>
+    <div class="span4 collapse-group auth_email_group">
+        <input type="text" class="auth_email_group form-control collapse in" id="article_title" placeholder="Enter the article title">
+    </div>
+    <br>
+    <div class="collapse in" id="story_div">
+        <p class="large-text left">With this research I could...</p>
+        <p id="counter" class="large-text right">85</p>
+        <textarea class="form-control" rows="4" id="story" maxlength=85 placeholder="Please finish the sentence above. This will be sent to the author. e.g 'understand my disease' or 'learn more about this aspect of culture'"></textarea>
+        <p class="small-text">Your story is important to email the author, read <a href="#" id="why">why</a>.</p>
     </div>
     <div class="btn-group input-group" data-toggle="buttons">
-        <button type="submit" class="btn btn-default orange lrgbutton" id="success">I got access!</button>
-        <button type="submit" class="btn btn-default orange lrgbutton" id="failure" disabled>I didn't get <br />access!<p class="small-text">Add to wish list</p></button>
+        <button type="submit" class="btn btn-default orange lrgbutton" id="submit" style="width: 100%" disabled>Send a new request</button>
     </div>
-    <table class="table footer">
+    <table class="table footer anchored-bottom" style="margin-bottom: 0;  text-align: center">
         <tr>
             <td><a href="#" id="bug">File a bug</a></td>
-            <td><a href="#" id="help">Help</a></td>
-            <td><a href="#" id="privacy">Privacy settings</a></td>
             <td><a href="#" id="logout">Logout</a></td>
         </tr>
     </table>

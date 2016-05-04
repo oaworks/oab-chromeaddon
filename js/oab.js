@@ -1,10 +1,17 @@
-var serviceaddress = 'https://openaccessbutton.org';
-var apiaddress = serviceaddress + '/api';
+var apiaddress = 'https://api.opendatabutton.org';
+var siteaddress = 'https://openaccessbutton.org';
 
 var oab = {
     ///////////////////////////////////
     // Using the oab api
     ///////////////////////////////////
+
+    // Tell the API which plugin version is in use for each POST
+    plugin_version_sign: function(pdata) {
+        var manifest = chrome.runtime.getManifest();
+        return $.extend(pdata, { plugin: manifest['version_name'], type: 'article' } );
+    },
+
     api_request: function(request_type, data, requestor, success_callback, failure_callback) {
         $.ajax({
             'type': 'POST',
@@ -13,11 +20,11 @@ var oab = {
             'dataType': 'JSON',
             'processData': false,
             'cache': false,
-            'data': data,
+            'data': JSON.stringify(this.plugin_version_sign(data)),
             'success': function(data){
-                success_callback(data, requestor)
+                success_callback(data['data'], requestor)
             },
-            'error': function(data){
+            'error': function(data) {
                 failure_callback(data)
             }
         });
@@ -47,7 +54,19 @@ var oab = {
         var authors = [];
         for (i=0; i<metas.length; i++) {
             if (metas[i].getAttribute("name") == "citation_author") {
-                authors.push(metas[i].getAttribute("content"));
+                var authname = metas[i].getAttribute("content");
+                authors.push( { name: authname } );
+            }
+        }
+        return authors;
+    },
+
+    return_author_email: function(metas) {
+        var authors = [];
+        for (i=0; i<metas.length; i++) {
+            if (metas[i].getAttribute("name") == "citation_author_email") {
+                var email = metas[i].getAttribute("content");
+                authors.push(email);
             }
         }
         return authors;
@@ -56,7 +75,8 @@ var oab = {
     return_journal: function(metas) {
         for (i=0; i<metas.length; i++) {
             if (metas[i].getAttribute("name") == "citation_journal_title") {
-                return metas[i].getAttribute("content");
+                var jtitle = metas[i].getAttribute("content");
+                return { name: jtitle }
             }
         }
     },
