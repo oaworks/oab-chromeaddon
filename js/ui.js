@@ -131,7 +131,8 @@ function handle_data(data) {
                 var doi = oab.return_doi(meta);
                 var author = oab.return_authors(meta);
                 var journal = oab.return_journal(meta);
-                fill_email_fields(undefined, title);                // fixme: we can't reliably scrape emails yet
+                var emails = oab.return_author_email(meta) || oab.scrape_emails(request.content);
+                fill_email_fields(emails[0], title);
 
                 var block_request = '/blocked/' + localStorage.getItem('blocked_id');
                 var data = {             // This is best-case (assume getting all info) for now.
